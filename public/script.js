@@ -58,7 +58,7 @@ function connectToNewUser(userId, stream) {
 function addVideoStream(video, stream) {
   video.srcObject = stream
   video.addEventListener('loadedmetadata', () => {
-    video.muted=true
+    // video.muted=true
     video.play()
    
   })
