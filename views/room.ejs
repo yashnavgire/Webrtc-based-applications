@@ -15,7 +15,8 @@
     #video-grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, 300px);
-      grid-auto-rows: 300px;
+      grid-auto-rows: 300px;    
+      grid-gap: 20px 50px;
     }
     
     video {
@@ -27,5 +28,10 @@
 </head>
 <body>
   <div id="video-grid"></div>
+  <br>
+  <input type="text" id="key"\>
+  <br> 
+  <br>
+  <button onclick="send()">send</button>
 </body>
 </html>
