@@ -17,10 +17,10 @@ const myVideo = document.createElement('video')
 myVideo.muted = true
 const peers = {}
 
-navigator.mediaDevices.getDisplayMedia({
-  // video: true,
-  // audio: true
-  cursor:true
+navigator.mediaDevices.getUserMedia({
+  video: true,
+  audio: true
+  // cursor:true
 }).then(stream => {
   addVideoStream(myVideo, stream)
 
@@ -34,7 +34,7 @@ navigator.mediaDevices.getDisplayMedia({
     })
   })
 
-  socket.emit('join-room', ROOM_ID, myId)
+  // socket.emit('join-room', ROOM_ID, myId)
 
   socket.on('user-connected', userId => {
     dataconn=connectToNewUser(userId, stream)
@@ -46,7 +46,7 @@ socket.on('user-disconnected', userId => {
 })
 
 myPeer.on('open', id => {
-  // socket.emit('join-room', ROOM_ID, id)
+  socket.emit('join-room', ROOM_ID, id)
   myId=id;
 })
 
