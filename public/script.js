@@ -17,10 +17,10 @@ const myVideo = document.createElement('video')
 myVideo.muted = true
 const peers = {}
 
-navigator.mediaDevices.getDisplayMedia({
-  // video: true,
-  // audio: true
-  cursor:true
+navigator.mediaDevices.getUserMedia({
+  video: true,
+  audio: true
+  // cursor:true
 }).then(stream => {
   addVideoStream(myVideo, stream)
 
@@ -126,3 +126,4 @@ function send(){
   data.id=myId;
   dataconn.send(data);
 }
+
