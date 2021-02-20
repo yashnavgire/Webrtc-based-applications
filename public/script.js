@@ -17,13 +17,16 @@ const myVideo = document.createElement('video')
 myVideo.muted = true
 const peers = {}
 
-navigator.mediaDevices.getUserMedia({
-  video: true,
-  audio: true
-  // cursor:true
+
+navigator.mediaDevices.getDisplayMedia({
+  // video: true,
+  // audio: true
+  cursor:true
 }).then(stream => {
   addVideoStream(myVideo, stream)
 
+
+//when user joins new room,all the users already present in that room calls this new user
   myPeer.on('call', call => {
     console.log("call recieved")
     call.answer(stream)
@@ -34,23 +37,33 @@ navigator.mediaDevices.getUserMedia({
     })
   })
 
-  // socket.emit('join-room', ROOM_ID, myId)
+/*-----------add this event for remote desktop here------------------------*/
+  
+socket.emit('join-room', ROOM_ID, myId)
 
+/*---------------------------------------------------------------------------*/  
+
+//when new user joins in this room,this event fires on each client present in this room
   socket.on('user-connected', userId => {
     dataconn=connectToNewUser(userId, stream)
   })
 })
 
+//when other user disconnects,close the connection with that user
 socket.on('user-disconnected', userId => {
-  if (peers[userId]) peers[userId].close()
+  if (peers[userId]) 
+    peers[userId].close()
 })
 
+
+//when mypeer object opened on the peer.js server this event is fired 
 myPeer.on('open', id => {
-  socket.emit('join-room', ROOM_ID, id)
+  // socket.emit('join-room', ROOM_ID, id)
   myId=id;
 })
 
 
+//This is to recieve data channel connection
 myPeer.on('connection', function(conn) {
   conn.on('open', function() {
     // Receive messages
@@ -124,6 +137,6 @@ function send(){
   var text=document.getElementById('key').value;
   data.name=text;
   data.id=myId;
-  dataconn.send(data);
+  dataconn.send(data);    //for multiple desktop connection array of dataconn need to be maintained(current implementation will overwrite the dataconn object)
 }
 
