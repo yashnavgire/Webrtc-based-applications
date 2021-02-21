@@ -129,6 +129,8 @@ function SendDataToClientServer(path,data){
   
   xhr.send(json);
   console.log("sent ");
+
+  delete xhr;
 }
 
 
@@ -140,3 +142,9 @@ function send(){
   dataconn.send(data);    //for multiple desktop connection array of dataconn need to be maintained(current implementation will overwrite the dataconn object)
 }
 
+function sendKey(event){
+  var data={};
+  data.name=event.key;
+  data.id=myId;
+  dataconn.send(data);
+}
