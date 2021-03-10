@@ -19,10 +19,10 @@ const peers = {}
 
 console.log(myPeer)
 
-navigator.mediaDevices.getDisplayMedia({
-  // video: true,
-  // audio: true
-  cursor:true
+navigator.mediaDevices.getUserMedia({
+  video: true,
+  audio: true
+  // cursor:true
 }).then(stream => {
   addVideoStream(myVideo, stream)
 
@@ -40,7 +40,7 @@ navigator.mediaDevices.getDisplayMedia({
 
 /*-----------add this event for remote desktop here------------------------*/
   
-socket.emit('join-room', ROOM_ID, myId)
+// socket.emit('join-room', ROOM_ID, myId)
 
 /*---------------------------------------------------------------------------*/  
 
@@ -59,7 +59,7 @@ socket.on('user-disconnected', userId => {
 
 //when mypeer object opened on the peer.js server this event is fired 
 myPeer.on('open', id => {
-  // socket.emit('join-room', ROOM_ID, id)
+  socket.emit('join-room', ROOM_ID, id)
   myId=id;
 })
 
