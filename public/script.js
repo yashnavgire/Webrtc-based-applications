@@ -6,9 +6,9 @@ var dataconn=null;
 const myPeer = new Peer({
   config: {'iceServers': [
     { url: 'stun:stun.l.google.com:19302' },
-    { url: 'turn:relay.backups.cz',
-      credential: 'webrtc',
-      username: 'webrtc'}
+    { url: 'turn:homeo@turn.bistri.com:80',
+      credential: 'homeo',
+      }
   ]} /* Sample servers, please use appropriate ones */
 })
 
