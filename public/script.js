@@ -6,9 +6,9 @@ var dataconn=null;
 const myPeer = new Peer({
   config: {'iceServers': [
     { url: 'stun:stun.l.google.com:19302' },
-    { url: 'turn:homeo@turn.bistri.com:80',
-      credential: 'homeo',
-      }
+    { url: 'turn:relay.backups.cz',
+      credential: 'webrtc',
+      username: 'webrtc'}
   ]} /* Sample servers, please use appropriate ones */
 })
 
@@ -17,6 +17,7 @@ const myVideo = document.createElement('video')
 myVideo.muted = true
 const peers = {}
 
+console.log(myPeer)
 
 navigator.mediaDevices.getDisplayMedia({
   // video: true,
@@ -82,6 +83,8 @@ myPeer.on('connection', function(conn) {
 function connectToNewUser(userId, stream) {
   console.log("calling..")
   const call = myPeer.call(userId, stream)
+  console.log(call)
+
   const video = document.createElement('video')
   call.on('stream', userVideoStream => {
     addVideoStream(video, userVideoStream)
