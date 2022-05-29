@@ -1,7 +1,13 @@
 const socket = io('/')
 const videoGrid = document.getElementById('video-grid')
+
+//update room link
+document.getElementById('room_link').href = window.location.href
+
+//global variables
 var myId=null;
 var dataconn=null;
+var send_emit_event_on_open=false
 
 const myPeer = new Peer({
   config: {'iceServers': [
@@ -16,50 +22,63 @@ const myPeer = new Peer({
 const myVideo = document.createElement('video')
 myVideo.muted = true
 const peers = {}
-
-console.log(myPeer)
+const peerVideoElements = {}
+//console.log(myPeer)
 
 navigator.mediaDevices.getUserMedia({
   video: true,
   audio: true
   // cursor:true
 }).then(stream => {
-  addVideoStream(myVideo, stream)
+    addVideoStream(myVideo, stream)
 
-
-//when user joins new room,all the users already present in that room calls this new user
-  myPeer.on('call', call => {
-    console.log("call recieved")
-    call.answer(stream)
-    const video = document.createElement('video')
-    call.on('stream', userVideoStream => {
-      console.log("stream recieved")
-      addVideoStream(video, userVideoStream)
+    //when new user joins room,all the users already present in that room calls this new user(this event will hit on the applicaiton of new user joined)
+    myPeer.on('call', call => {
+        console.log("call recieved")
+        //console.log(call)
+        peers[call.peer] = call
+        call.answer(stream)
+        const video = document.createElement('video')
+        call.on('stream', userVideoStream => {
+            console.log("stream recieved")
+            addVideoStream(video, userVideoStream)          
+        })
+        call.on('close', () => {
+            //console.log("disonnect")
+            video.remove()
+        })
     })
-  })
 
 /*-----------add this event for remote desktop here------------------------*/
-  
-// socket.emit('join-room', ROOM_ID, myId)
-
+    if(myId !== null) {
+        socket.emit('join-room', ROOM_ID, myId)
+    }
+    else{
+        send_emit_event_on_open=true
+    }
 /*---------------------------------------------------------------------------*/  
 
-//when new user joins in this room,this event fires on each client present in this room
-  socket.on('user-connected', userId => {
-    dataconn=connectToNewUser(userId, stream)
-  })
+    //when new user joins in this room,this event fires on each client present in this room.
+    socket.on('user-connected', userId => {
+        dataconn=connectToNewUser(userId, stream)
+    })
 })
 
 //when other user disconnects,close the connection with that user
 socket.on('user-disconnected', userId => {
-  if (peers[userId]) 
-    peers[userId].close()
+    console.log("disconnect recieved")
+    if (peers[userId])
+    {
+        peers[userId].close()
+    }
 })
 
 
 //when mypeer object opened on the peer.js server this event is fired 
 myPeer.on('open', id => {
-  socket.emit('join-room', ROOM_ID, id)
+  if(send_emit_event_on_open)
+    socket.emit('join-room', ROOM_ID, id)
+  
   myId=id;
 })
 
@@ -83,7 +102,7 @@ myPeer.on('connection', function(conn) {
 function connectToNewUser(userId, stream) {
   console.log("calling..")
   const call = myPeer.call(userId, stream)
-  console.log(call)
+  //console.log(call)
 
   const video = document.createElement('video')
   call.on('stream', userVideoStream => {
@@ -114,6 +133,7 @@ function connectToNewUser(userId, stream) {
 
 function addVideoStream(video, stream) {
   video.srcObject = stream
+  video.controls = true
   video.addEventListener('loadedmetadata', () => {
     // video.muted=true
     video.play()
